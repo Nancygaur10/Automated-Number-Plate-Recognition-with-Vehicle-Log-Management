@@ -1,0 +1,7 @@
+django==5.2.13
+ultralytics==8.3.252
+filterpy==1.4.5 # for SORT tracker
+lap==0.5.13 # for SORT tracker
+opencv-python==4.13.0.92
+easyocr==1.7.2
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
