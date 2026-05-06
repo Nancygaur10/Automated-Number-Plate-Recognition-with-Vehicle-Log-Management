@@ -124,7 +124,6 @@ ANPR/
 Link - https://drive.google.com/drive/folders/10xMNdhKLIMLBzHNBn5DmxcUH2GL8KlYF
 
 ---
----
 ## 🛠️ Installation & Setup
 
 ### 1️⃣ Clone the Repository
