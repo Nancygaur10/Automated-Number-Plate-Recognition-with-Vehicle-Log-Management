@@ -64,7 +64,7 @@ The system supports both:
 ---
 
 ## 📂 Project Structure
-
+'''
 ANPR/
 │
 ├── ANPRLMS/                 **# Main Django Project Folder**
@@ -118,7 +118,7 @@ ANPR/
 ├── manage.py
 ├── requirements.txt
 └── README.md
-
+'''
 ---
 
 ## 🛠️ Installation & Setup
