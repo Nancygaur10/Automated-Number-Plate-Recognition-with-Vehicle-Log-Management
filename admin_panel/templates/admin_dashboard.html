@@ -1,0 +1,640 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ADMIN DASHBOARD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  </head>
+  <body>
+    
+    
+    <!--  Top Navbar -->
+    <nav class="navbar navbar-light bg-light px-3 custom-navbar">
+        <button class="btn btn-outline-light d-md-none me-2" type="button"
+                data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar">
+            <i class="bi bi-list"></i>
+        </button>
+        <div>
+          <img src="{% static 'media/logo.png' %}"  class="logo-img" alt="">
+          <a class="navbar-brand fw-bold" href="#">GATEKEEPER ALPR ADMIN PORTAL</a>
+        </div>
+
+        <div class="d-flex align-items-center">
+            <i class="blue-text bi bi-gear me-3"></i>
+            <i class="blue-text bi bi-envelope me-3"></i>
+
+            <div class="dropdown">
+                <a class="blue-text dropdown-toggle text-decoration-none" href="#" data-bs-toggle="dropdown">
+                    {{ request.user.username }}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-light dropdown-menu-end">
+                    <li><a class="blue-text dropdown-item" href="#">My Profile</a></li>
+                    <li><a class="blue-text dropdown-item" href="#">Settings</a></li>
+                    <li><a class="blue-text dropdown-item" href="{% url 'logout' %}" onclick="return confirm('Are you sure you want to logout?')">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    
+
+    <div class="main-wrapper">
+
+        <!--  Sidebar -->
+        <div class="sidebar bg-light p-3">
+            <ul class="nav flex-column">
+
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'admin_dashboard' %}">
+                        <i class="bi bi-house"></i> Dashboard
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'vehicle_records' %}">
+                        <i class="bi bi-car-front"></i> Vehicle Records
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'smart_scan' %}">
+                        <i class="bi bi-camera-video"></i> Smart Scan
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'blacklist_whitelist' %}">
+                        <i class="bi bi-shield-lock"></i> Blacklist / Whitelist
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+        
+        <div class="content p-4">
+            <!-- cards   -->
+            <div class="row g-4">
+                
+                <!-- Total entries -->
+                <div class="col-lg-3 col-md-6 col-12">
+                    <div class="dashboard-card card-blue">
+                        <div class="card-title"><i class="fa-solid fa-car-side blue"></i>  Entries Today</div>
+                        <!-- Static now -->
+                        <div class="card-value blue">
+                            0
+                            <!-- {{total_entries_today}} -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 col-12">
+                    <div class="dashboard-card card-orange">
+                        <div class="card-title">Latest Detection
+                            <!-- Status Badge -->
+                            <span class="badge bg-success" id="plateStatus">
+                                
+                                <!-- {{latest_status}} -->
+                            </span>
+                        </div>
+                        
+                        <!-- License Plate -->
+                        <div id="latestPlate" class="card-value orange">
+                            No Detection
+                            <!-- {{latest_plate}} -->
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+                
+                <!-- Active Cameras -->
+                <div class="col-lg-3 col-md-6 col-12">
+                    <div class="dashboard-card card-green">
+                        <div class="card-title"><i class="fa-solid fa-video green"></i>  Active Cameras</div>
+                        <!-- Static now -->
+                        <div id="activeCameras" class="card-value green">
+                            1 Online
+                            <!-- {{active_cameras}} -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Alerts -->
+                <div class="col-lg-3 col-md-6 col-12">
+                    <div class="dashboard-card card-red">
+                        <div class="card-title"><i class="fa-solid fa-triangle-exclamation red"></i>  Blacklist Alerts Today</div>
+                        <!-- Static now -->
+                        <div id="alertsToday" class="card-value red">
+                            0 Alerts
+                            <!-- {{alerts}} -->
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <div class="row g-4 mt-1">
+                <!-- Camera Section -->
+                <div class="col-12 col-lg-5 col-md-6 mb-2">
+                    <div class="camera-card h-100">
+                        
+                        <!-- Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Live Camera Feed</h5>
+                            <div class="live-indicator">
+                                <span class="live-dot"></span> LIVE
+                            </div>
+                        </div>
+                        
+                        <!-- Camera Feed -->
+                        <div class="camera-wrapper">
+                            <!-- Django Video Stream -->
+                            <img src="{% url 'video_feed' %}" class="camera-feed img-fluid"/>
+                            
+                            <!-- Optional Overlay Info -->
+                            <div class="camera-overlay">
+                                <div class="camera-label">Camera 01 &#8226; North Gate</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div class="status">
+                                <span class="status-dot"></span> Tracking Active
+                            </div>
+                            <div id="time" class="time"></div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center px-2 mt-3">
+                            <span class="text-light">Video</span>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="videoToggle" checked>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center px-2 mt-2">
+                            <span class="text-light">Detection</span>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="detectionToggle">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-7 col-md-6">
+                <div class="alert-panel">
+                    
+                    <!-- Header -->
+                    <div class="alert-header">
+                        <h5><i class="fa-solid fa-triangle-exclamation text-danger"></i> Blacklist Alerts</h5>
+                        <span id="alertCount" class="alert-count">0</span>
+                    </div>
+                    
+                    <!-- Alert List -->
+                    <div id="alertList" class="alert-list">
+                        <div class="no-alerts">No alerts yet</div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <!-- Recent Detections -->
+            <div class="card custom-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Vehicle Records</h5>
+                    
+                    <!-- Search -->
+                    <form method="GET" class="d-flex">
+                        <div class="search-container">
+                            <i class="bi bi-search search-icon"></i>
+                            <input type="text" name="q" class="form-control me-2 search-input" value="{{ request.GET.q|default:'' }}" placeholder="Search Plate">
+                            <button class="search-btn">Search</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Date & Time</th>
+                                <th>License Plate</th>
+                                <th>Status</th>
+                                <th>Frame</th>
+                            </tr>
+                        </thead>
+                        
+                        <tbody id="realtimeTable">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    Loading...
+                                </td>
+                            </tr>
+                        </tbody>
+                        
+                    </table>
+                    
+                    <div class="d-flex justify-content-between align-items-center p-3">
+                        
+                        <small class="record-info" id="recordInfo">
+                            Loading...
+                        </small>
+                        
+                        <nav>
+                            <ul class="pagination custom-pagination mb-0" id="paginationControls">
+                            </ul>
+                        </nav>
+                        
+                    </div>
+                    
+                </div>
+            </div>
+            
+        </div>
+        
+    </div>
+    
+</div>
+<div id="blacklistPopup" class="blacklist-popup" style="display:none;">
+    <div class="popup-box">
+        <h4> BLACKLIST ALERT</h4>
+        
+        <p><b>Plate:</b> <span id="popupPlate"></span></p>
+        <p><b>Status:</b> <span id="popupStatus"></span></p>
+        <p><b>Time:</b> <span id="popupTime"></span></p>
+        
+        <button onclick="closePopup()" class="btn btn-danger mt-2">
+            Close
+        </button>
+    </div>
+</div>
+
+<div id="imageModal" class="image-modal">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <img class="modal-content" id="modalImage">
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+
+<script>
+    let seenBlacklistPlates = new Set();
+    let seenAlerts = new Set();
+    let lastPopupTime = 0;
+    let currentPage = 1;
+    let lastData = "";
+    let currentQuery = "";
+    let autoRefresh = true;
+    document.addEventListener("DOMContentLoaded", function () {
+            fetch("/admin_panel/start_video/");
+            fetch("/admin_panel/start_detection/");
+
+            document.getElementById("detectionToggle").checked = true;
+
+            // FIRST LOAD
+            loadRealtimeData(1);
+
+            // SINGLE CLEAN LOOP
+            setInterval(() => {
+                if (autoRefresh) {
+                    loadRealtimeData(currentPage);
+                }
+            }, 2000);
+        });
+
+        function control(action) {
+            fetch(`/admin_panel/${action}/`)
+                .then(res => res.text())
+                .then(data => console.log(data))
+                .then(data => {
+                    console.log(data);
+
+                    if (this.id === "videoToggle") {
+                        document.getElementById("liveText").innerText = this.checked ? "LIVE" : "STOPPED";
+                    }
+
+                    if (this.id === "detectionToggle") {
+                        document.getElementById("statusText").innerText = this.checked ? "Detection OFF" : "Tracking Active";
+                    }
+                });
+        }
+
+        const statusText = document.querySelector(".status");
+
+        document.getElementById("detectionToggle").addEventListener("change", function () {
+
+            const statusText = document.querySelector(".status");
+
+            if (this.checked) {
+                //  Detection ON
+                statusText.innerHTML = '<span class="status-dot"></span> Tracking Active';
+
+                fetch("/admin_panel/start_detection/")
+                    .then(res => res.text())
+                    .then(data => console.log(data));
+
+            } else {
+                //  Detection OFF
+                statusText.innerHTML = '<span class="status-dot"></span> Detection OFF';
+
+                fetch("/admin_panel/stop_detection/")
+                    .then(res => res.text())
+                    .then(data => console.log(data));
+            }
+
+        });
+
+        document.getElementById("videoToggle").addEventListener("change", function () {
+
+            if (this.checked) {
+                fetch("/admin_panel/start_video/")
+                    .then(res => res.text())
+                    .then(data => console.log(data));
+            } else {
+                fetch("/admin_panel/stop_video/")
+                    .then(res => res.text())
+                    .then(data => console.log(data));
+            }
+
+        });
+
+
+        function loadRealtimeData(page = 1) {
+
+            fetch(`/admin_panel/realtime-data/?page=${page}&q=${currentQuery}`)
+                .then(res => {
+                    if (!res.ok) throw new Error("Network error");
+                    return res.json();
+                })
+                .then(data => {
+
+                    currentPage = data.page;
+
+                    let newData = JSON.stringify(data.records);
+
+                    if (newData === lastData && !currentQuery) return;
+
+                    lastData = newData;
+
+                    const table = document.getElementById("realtimeTable");
+                    table.innerHTML = "";
+
+                    if (data.records.length === 0) {
+                        table.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    No records found
+                                </td>
+                            </tr>
+                        `;
+                        document.getElementById("recordInfo").innerText = "No records found";
+                        document.getElementById("paginationControls").innerHTML = "";
+                        return;
+                    }
+
+                    data.records.forEach((rec, index) => {
+
+                        let badgeClass = "bg-warning text-dark";
+                        const status = rec.status.toUpperCase().trim();
+
+                        if (status.startsWith("BLACKLIST")) {
+
+                            badgeClass = "bg-danger";
+
+                            if (!seenBlacklistPlates.has(rec.plate)) {
+                                seenBlacklistPlates.add(rec.plate);
+
+                                triggerBlacklistAlert(rec.plate);
+                                if (Date.now() - lastPopupTime > 5000) {
+                                    showBlacklistPopup(rec);
+                                    playAlertSound();
+                                    lastPopupTime = Date.now();
+                                }
+                            }
+                        }
+                        else if (
+                            status.includes("VIP") ||
+                            status.includes("RESIDENT") ||
+                            status.includes("STAFF")
+                        ) {
+                            badgeClass = "bg-success";
+                        }
+
+                        table.innerHTML += `
+                            <tr>
+                                <td>${(data.page - 1) * 4 + index + 1}</td>
+                                <td>${rec.datetime}</td>
+                                <td>${rec.plate}</td>
+                                <td><span class="badge ${badgeClass}">${rec.status}</span></td>
+                                <td>
+                                    <img src="/static/${rec.image}" class="frame-img"
+                                        onclick="openModal(this.src)">
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    //  record info
+                    const start = (data.page - 1) * 4 + 1;
+                    const end = start + data.records.length - 1;
+
+                    document.getElementById("recordInfo").innerText =
+                        currentQuery
+                        ? `Showing ${start}–${end} of ${data.total_records} results for "${currentQuery}"`
+                        : `Showing ${start}–${end} of ${data.total_records} records`;
+
+                    //  pagination
+                    const pagination = document.getElementById("paginationControls");
+                    pagination.innerHTML = "";
+
+                    if (data.has_prev) {
+                        pagination.innerHTML += `
+                            <li class="page-item">
+                                <a class="page-link" href="#"
+                                onclick="event.preventDefault(); loadRealtimeData(${data.page - 1})">
+                                ← Previous
+                                </a>
+                            </li>`;
+                    }
+
+                    pagination.innerHTML += `
+                        <li class="page-item disabled">
+                            <span class="page-link">Page ${data.page}</span>
+                        </li>`;
+
+                    if (data.has_next) {
+                        pagination.innerHTML += `
+                            <li class="page-item">
+                                <a class="page-link" href="#"
+                                onclick="event.preventDefault(); loadRealtimeData(${data.page + 1})">
+                                Next →
+                                </a>
+                            </li>`;
+                    }
+
+                    // Total Entries Today
+                    document.querySelector(".card-blue .card-value").innerText = data.today_count;
+    
+                    // Latest Plate
+                    document.getElementById("latestPlate").innerText = data.latest_plate || "--";
+
+                    //  Blacklist Alerts
+                    document.getElementById("alertsToday").innerText =
+                        (data.today_alert_count ?? 0) + " Alerts";
+    
+                    // Status badge
+                    const statusBadge = document.getElementById("plateStatus");
+    
+                    const status = (data.latest_status || "UNKNOWN").toUpperCase();
+
+                    statusBadge.innerText = status;
+                    statusBadge.className = "badge";
+
+                    //  match dynamic values
+                    if (status.includes("BLACKLIST")) {
+                        statusBadge.classList.add("bg-danger");
+                        if (!seenBlacklistPlates.has(data.latest_plate)) {
+                            seenBlacklistPlates.add(data.latest_plate);
+                            triggerBlacklistAlert(data.latest_plate);
+                        showBlacklistToast(data.latest_plate);
+                        }
+                    }
+                    else if (
+                        ["VIP", "RESIDENT", "STAFF"].some(tag => status.includes(tag))
+                    ) {
+                        statusBadge.classList.add("bg-success");
+                    }
+                    else {
+                        statusBadge.classList.add("bg-warning", "text-dark");
+                    }
+
+                    if (data.new_alerts && data.new_alerts.length > 0) {
+                        data.new_alerts.forEach(alert => {
+                            showBlacklistPopup(alert);
+                            playAlertSound();
+                        });
+                    }
+                    
+                updateAlertPanel(data.alerts || []);
+
+                })
+                .catch(err => {
+                    console.error("Dashboard fetch failed:", err);
+
+                    // optional retry safety
+                    setTimeout(() => {
+                        loadRealtimeData(currentPage);
+                    }, 3000);
+                });
+        }
+
+        // 🔍 Live typing search
+        document.querySelector("input[name='q']").addEventListener("input", function () {
+            currentQuery = this.value;
+
+            autoRefresh = currentQuery === "";  // stop realtime while searching
+
+            loadRealtimeData(1);
+        });
+
+        // 🔍 Search button
+        document.querySelector("form").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            currentQuery = document.querySelector("input[name='q']").value;
+
+            autoRefresh = currentQuery === "";
+
+            loadRealtimeData(1);
+        });
+        
+        function openModal(src) {
+            document.getElementById("imageModal").style.display = "block";
+            document.getElementById("modalImage").src = src;
+        }
+
+        function closeModal() {
+            document.getElementById("imageModal").style.display = "none";
+        }
+
+        // close when clicking outside image
+        window.onclick = function(event) {
+            const modal = document.getElementById("imageModal");
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        function updateAlertPanel(alerts) {
+
+            const container = document.getElementById("alertList");
+            const countBox = document.getElementById("alertCount");
+
+            countBox.innerText = alerts.length;
+
+            alerts.forEach(alert => {
+
+                const key = alert.plate + alert.datetime;
+
+                if (seenAlerts.has(key)) return;  // prevent duplicates
+                seenAlerts.add(key);
+
+                const item = document.createElement("div");
+                item.className = "alert-item";
+
+                item.innerHTML = `
+                    <div class="alert-info">
+                        <span class="alert-plate">${alert.plate}</span>
+                        <span class="alert-time">${alert.datetime}</span>
+                    </div>
+                    <span class="alert-close" onclick="this.parentElement.remove()">&times;</span>
+                `;
+
+                container.prepend(item);  // newest first
+            });
+        }
+
+        document.addEventListener("click", () => {
+            window.userInteracted = true;
+        }, { once: true });
+
+        function playAlertSound() {
+            if (!window.userInteracted) return;  // 🔥 prevent autoplay block
+
+            const audio = new Audio("/static/media/alert_sound2.mpeg");
+            audio.play().catch(err => console.log("Audio blocked:", err));
+        }
+
+        function showBlacklistToast(plate) {
+            document.getElementById("toastPlate").innerText = plate;
+
+            const toastEl = document.getElementById("blacklistToast");
+            const toast = new bootstrap.Toast(toastEl);
+
+            toast.show();
+        }
+
+        function showBlacklistPopup(rec) {
+            document.getElementById("popupPlate").innerText = rec.plate;
+            document.getElementById("popupStatus").innerText = rec.status;
+            document.getElementById("popupTime").innerText = rec.datetime;
+
+            document.getElementById("blacklistPopup").style.display = "flex";
+        }
+
+        function closePopup() {
+            document.getElementById("blacklistPopup").style.display = "none";
+        }
+
+
+        // initial load
+        loadRealtimeData();
+    </script>
+  </body>
+</html>

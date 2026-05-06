@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+            
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+        height: 100vh;
+        background: linear-gradient(135deg, #dfe9f3, #c3d3f0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Card */
+    .container {
+        background: #fff;
+        padding: 40px;
+        width: 350px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    /* Heading */
+    .container h1 {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .container p {
+        color: #777;
+        margin-bottom: 25px;
+    }
+
+    /* Input Fields */
+    .input-box {
+        position: relative;
+        margin-bottom: 15px;
+    }
+
+    .input-box input {
+        width: 100%;
+        padding: 12px 12px 12px 40px;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        outline: none;
+        transition: 0.3s;
+    }
+
+    .input-box input:focus {
+        border-color: #4a6cf7;
+        box-shadow: 0 0 5px rgba(74,108,247,0.3);
+    }
+
+    /* Icons */
+    .input-box i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #888;
+    }
+
+    /* Button */
+    button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 12px;
+        background: linear-gradient(90deg, #4a6cf7, #6a8dff);
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        opacity: 0.9;
+    }
+
+    /* Login link */
+    .login-link {
+        margin-top: 20px;
+        font-size: 14px;
+    }
+
+    .login-link a {
+        color: #4a6cf7;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+
+    </style>
+</head>
+<body>
+    <form method="post">
+        {% csrf_token %}
+        <div class="container" >
+            <h1>Log In</h1>
+
+            <div class="input-box">
+                <i>👤</i>
+                <input type="text" placeholder="Full Name" name="name">
+            </div>
+
+            <div class="input-box">
+                <i>🔒</i>
+                <input type="password" placeholder="Password" name="password">
+            </div>
+
+            <button>Log in</button>
+
+            {% if error %}
+            <p style="color: red;">{{error}}</p>
+            {% endif %}
+    </form>
+</body>
+</html>

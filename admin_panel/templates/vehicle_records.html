@@ -1,0 +1,342 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ADMIN DASHBOARD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/vehicle_records.css' %}">
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  </head>
+  <body>
+    
+    
+    <!--  Top Navbar -->
+    <nav class="navbar navbar-light bg-light px-3 custom-navbar">
+        <button class="btn btn-outline-light d-md-none me-2" type="button"
+                data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar">
+            <i class="bi bi-list"></i>
+        </button>
+        <div>
+          <img src="{% static 'media/logo.png' %}"  class="logo-img" alt="">
+          <a class="navbar-brand fw-bold" href="#">GATEKEEPER ALPR ADMIN PORTAL</a>
+        </div>
+
+        <div class="d-flex align-items-center">
+            <i class="blue-text bi bi-gear me-3"></i>
+            <i class="blue-text bi bi-envelope me-3"></i>
+
+            <div class="dropdown">
+                <a class="blue-text dropdown-toggle text-decoration-none" href="#" data-bs-toggle="dropdown">
+                    {{ request.user.username }}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-light dropdown-menu-end">
+                    <li><a class="blue-text dropdown-item" href="#">My Profile</a></li>
+                    <li><a class="blue-text dropdown-item" href="#">Settings</a></li>
+                    <li><a class="blue-text dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+
+        <!--  Sidebar -->
+        <div class="sidebar bg-light p-3">
+            <ul class="nav flex-column">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admin_dashboard' %}">
+                        <i class="bi bi-house"></i> Dashboard
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'vehicle_records' %}">
+                        <i class="bi bi-car-front"></i> Vehicle Records
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'smart_scan' %}">
+                        <i class="bi bi-camera-video"></i> Smart Scan
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'blacklist_whitelist' %}">
+                        <i class="bi bi-shield-lock"></i> Blacklist / Whitelist
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="content p-4">
+
+          <div class="row g-4 mt-1">
+
+            <!-- Recent Detections -->
+            <div class="card custom-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Vehicle Records</h5>
+
+                    <!-- Search -->
+                    <form method="GET" class="d-flex">
+                        <div class="search-container me-2">
+                            <i class="bi bi-search search-icon"></i>
+                            <input type="text" name="q" class="form-control me-2 search-input" value="{{ request.GET.q|default:'' }}" placeholder="Search Plate">
+                            <button class="search-btn">Search</button>
+                        </div>
+
+                        <div class="filter-container">
+
+                            <!-- Date -->
+                            <div class="filter-box">
+                                <i class="bi bi-calendar3 filter-icon"></i>
+                                <input type="date" id="filterDate" class="filter-input">
+                            </div>
+
+                            <!-- Status -->
+                            <div class="filter-box">
+                                <i class="bi bi-funnel filter-icon"></i>
+                                <select id="filterStatus" class="filter-input">
+                                    <option value="">All Status</option>
+                                    <option class="options" value="ALLOWED">Allowed</option>
+                                    <option class="options" value="BLACKLIST">Blacklist</option>
+                                    <option class="options" value="UNKNOWN">Unknown</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Date & Time</th>
+                                <th>License Plate</th>
+                                <th>Status</th>
+                                <th>Frame</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="realtimeTable">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    Loading...
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                    <div class="d-flex justify-content-between align-items-center p-3">
+
+                        <small class="record-info" id="recordInfo">
+                            Loading...
+                        </small>
+
+                        <nav>
+                            <ul class="pagination custom-pagination mb-0" id="paginationControls">
+                            </ul>
+                        </nav>
+
+                    </div>
+
+                </div>
+            </div>
+            
+          </div>
+
+        </div>
+
+    </div>
+
+    <!-- Image Zoom Modal -->
+    <div id="imageModal" class="image-modal">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
+
+    <script>
+
+        let currentPage = 1;
+        let lastData = "";
+        let currentQuery = "";
+        let autoRefresh = true;
+        let currentDate = "";
+        let currentStatus = "";
+
+        function loadRealtimeData(page = 1) {
+
+            fetch(`/admin_panel/vehicle-data/?page=${page}&q=${currentQuery}&date=${currentDate}&status=${currentStatus}`)
+                .then(res => res.json())
+                .then(data => {
+
+                    currentPage = data.page;
+
+                    let newData = JSON.stringify(data.records);
+
+                    //  prevent blinking
+                    if (newData === lastData) return;
+
+                    lastData = newData;
+
+                    const table = document.getElementById("realtimeTable");
+                    table.innerHTML = "";
+
+                    if (data.records.length === 0) {
+                        table.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    No records found
+                                </td>
+                            </tr>
+                        `;
+                        document.getElementById("recordInfo").innerText = "No records found";
+                        document.getElementById("paginationControls").innerHTML = "";
+                        return;
+                    }
+
+                    data.records.forEach((rec, index) => {
+
+                        let badgeClass = "bg-warning text-dark";
+                        const status = rec.status.toUpperCase().trim();
+
+                        if (status.startsWith("BLACKLIST")) {
+
+                            badgeClass = "bg-danger";
+
+                        }
+                        else if (
+                            status.includes("VIP") ||
+                            status.includes("RESIDENT") ||
+                            status.includes("STAFF")
+                        ) {
+                            badgeClass = "bg-success";
+                        }
+
+                        table.innerHTML += `
+                            <tr>
+                                <td>${(data.page - 1) * 7 + index + 1}</td>
+                                <td>${rec.datetime}</td>
+                                <td>${rec.plate}</td>
+                                <td><span class="badge ${badgeClass}">${rec.status}</span></td>
+                                <td>
+                                    <img src="/static/${rec.image}" class="frame-img"
+                                        onclick="openModal(this.src)"
+                                        onerror="this.src='/static/images/no-image.png'">
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    //  record info
+                    const start = (data.page - 1) * 7 + 1;
+                    const end = start + data.records.length - 1;
+
+                    document.getElementById("recordInfo").innerText =
+                        currentQuery
+                        ? `Showing ${start}–${end} of ${data.total_records} results for "${currentQuery}"`
+                        : `Showing ${start}–${end} of ${data.total_records} records`;
+
+                    //  pagination
+                    const pagination = document.getElementById("paginationControls");
+                    pagination.innerHTML = "";
+
+                    if (data.has_prev) {
+                        pagination.innerHTML += `
+                            <li class="page-item">
+                                <a class="page-link" href="#"
+                                onclick="event.preventDefault(); loadRealtimeData(${data.page - 1})">
+                                ← Previous
+                                </a>
+                            </li>`;
+                    }
+
+                    pagination.innerHTML += `
+                        <li class="page-item disabled">
+                            <span class="page-link">Page ${data.page}</span>
+                        </li>`;
+
+                    if (data.has_next) {
+                        pagination.innerHTML += `
+                            <li class="page-item">
+                                <a class="page-link" href="#"
+                                onclick="event.preventDefault(); loadRealtimeData(${data.page + 1})">
+                                Next →
+                                </a>
+                            </li>`;
+                    }
+                });
+        }
+
+        //  Live typing search
+        document.querySelector("input[name='q']").addEventListener("input", function () {
+            currentQuery = this.value;
+
+            autoRefresh = currentQuery === "";  // stop realtime while searching
+
+            loadRealtimeData(1);
+        });
+        
+        //  Search button
+        document.querySelector("form").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            currentQuery = document.querySelector("input[name='q']").value;
+
+            autoRefresh = currentQuery === "";
+
+            loadRealtimeData(1);
+        });
+
+        document.getElementById("filterDate").addEventListener("change", function () {
+            currentDate = this.value;
+            loadRealtimeData(1);
+        });
+
+        document.getElementById("filterStatus").addEventListener("change", function () {
+            currentStatus = this.value;
+            loadRealtimeData(1);
+        });
+
+        function openModal(src) {
+            document.getElementById("imageModal").style.display = "block";
+            document.getElementById("modalImage").src = src;
+        }
+
+        function closeModal() {
+            document.getElementById("imageModal").style.display = "none";
+        }
+
+        // close when clicking outside image
+        window.onclick = function(event) {
+            const modal = document.getElementById("imageModal");
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        //  auto refresh
+        setInterval(() => {
+            if (autoRefresh) {
+                loadRealtimeData(currentPage);
+            }
+        }, 2000);
+
+        // initial load
+        loadRealtimeData();
+    </script>
+  </body>
+</html>

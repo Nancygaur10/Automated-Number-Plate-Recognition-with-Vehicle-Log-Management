@@ -1,0 +1,143 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+html,body {
+    height: 100vh;
+    margin: 0;
+}
+
+.main-wrapper{
+    min-height: 100vh;
+    background: linear-gradient(rgba(10, 30, 80, 0.112), rgba(0, 119, 255, 0.063)), url('../media/background.png') no-repeat center center;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Card */
+.container {
+    background: #fff;
+    padding: 25px 40px;
+    width: 350px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Heading */
+.container h2 {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #1f3a5f;
+}
+
+.container p {
+    color: #777;
+    margin-bottom: 25px;
+}
+
+.logo-img{
+    height: clamp(60px, 80px, 100px);
+    width: auto;
+}
+
+/* Input Fields */
+.input-box {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.input-box input {
+    width: 100%;
+    padding: 6px 6px 10px 40px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    outline: none;
+    transition: 0.3s;
+}
+
+.input-box input:focus {
+    border-color: #1f3a5f;
+    box-shadow: 0 0 5px rgba(74, 109, 247, 0.401);
+}
+
+/* Icons */
+.input-box i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+}
+
+.create-btn{
+    background-color: #1f3a5f;
+    border: none;
+    color: #fff;
+    padding: 8px 6px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.create-btn:hover {
+    background-color: #16324d;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(31, 58, 95, 0.3);
+}
+
+
+/* Login link */
+.login-link {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.login-link a {
+    color: #4a6cf7;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+.custom-toggle {
+    background: #fff;
+    border-radius: 30px;
+    padding: 2px;
+    border: 2px solid #cfd4da;
+    display: flex;
+}
+
+.custom-toggle .btn {
+    border: none;
+    border-radius: 30px;
+    color: #333;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    flex: 1;
+    z-index: 1;
+}
+
+/* Active button */
+.custom-toggle .btn-check:checked + .btn {
+    background: #cfd4da;
+    color: #1f3a5f;
+}
+
+/* Remove default bootstrap border */
+.custom-toggle .btn {
+    border: none;
+    color: #1f3a5f;
+}
+
+.custom-toggle .btn:hover {
+    transform: translateY(-2px);
+}
